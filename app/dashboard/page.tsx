@@ -1,7 +1,7 @@
 "use client";
 import { useAuth } from "@/hooks/useAuth";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
-import Image from "next/legacy/image";
+import Image from "next/image";
 import {
   BarChart,
   Bar,
@@ -49,8 +49,11 @@ export default function UserDashboard() {
             <Image
               src="https://media.discordapp.net/attachments/1311899863960780831/1343570059225731174/IMG_6551.png?ex=67c3af60&is=67c25de0&hm=adb6befaf30616c11ea5f09534904bf06c8142dc42c6831a06955e1ac81d0f68&=&format=webp&quality=lossless&width=439&height=585"
               alt="Profile"
-              layout="fill"
-              objectFit="cover"
+              fill
+              sizes="100vw"
+              style={{
+                objectFit: "cover",
+              }}
             />
           </div>
           <div>
@@ -123,9 +126,12 @@ export default function UserDashboard() {
               <Image
                 src="https://media.discordapp.net/attachments/1311899863960780831/1343570059225731174/IMG_6551.png?ex=67c3af60&is=67c25de0&hm=adb6befaf30616c11ea5f09534904bf06c8142dc42c6831a06955e1ac81d0f68&=&format=webp&quality=lossless&width=439&height=585"
                 alt="Gallery Image 1"
-                layout="fill"
-                objectFit="cover"
                 className="transition-transform duration-500 group-hover:scale-110"
+                fill
+                sizes="100vw"
+                style={{
+                  objectFit: "cover",
+                }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
                 <h3 className="text-white font-bold text-lg">Portrait Mode</h3>
@@ -138,9 +144,12 @@ export default function UserDashboard() {
               <Image
                 src="https://media.discordapp.net/attachments/726029446557073415/1343410434220359750/IMG_6553.jpg?ex=67c3c376&is=67c271f6&hm=1f370263537d4c6967e45b92e8a42bf30b11ca1afd276703669ae1a50c67d97b&=&format=webp&width=651&height=585"
                 alt="Gallery Image 2"
-                layout="fill"
-                objectFit="cover"
                 className="transition-transform duration-500 group-hover:scale-110"
+                fill
+                sizes="100vw"
+                style={{
+                  objectFit: "cover",
+                }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
                 <h3 className="text-white font-bold text-lg">Landscape Shot</h3>
