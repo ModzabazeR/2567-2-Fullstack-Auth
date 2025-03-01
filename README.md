@@ -1,128 +1,208 @@
-# Authentication Flow Documentation (Next.js + JWT + Role-based Access Control)
+# ระบบตรวจสอบสิทธิ์ใน Next.js (Next.js Authentication System)
 
 ## 📌 ภาพรวมของระบบ
 
-โครงการนี้เป็นระบบ **Authentication และ Authorization** ที่รองรับ **Role-based Access Control (RBAC)** โดยมี 3 ระดับสิทธิ์การเข้าถึง:
-- **User** → มีสิทธิ์เข้าถึงข้อมูลพื้นฐาน
-- **Manager** → มีสิทธิ์จัดการข้อมูลบางส่วน
-- **Admin** → มีสิทธิ์ควบคุมระบบทั้งหมด
+โครงการนี้เป็นระบบตรวจสอบสิทธิ์ที่พัฒนาโดยใช้:
+- **Next.js 14** (App Router)
+- **Prisma ORM** (จัดการฐานข้อมูล)
+- **MySQL Database** (เก็บข้อมูลผู้ใช้)
+- **JWT Authentication** (ตรวจสอบสิทธิ์ด้วย Token)
+- **Role-based Access Control** (แบ่งระดับการเข้าถึงตาม Role)
+- **Shadcn/UI Components** (UI ทันสมัยและใช้งานง่าย)
+- **Sonner Toast Notifications** (ระบบแจ้งเตือนแบบ Toast)
 
 ---
 
-## 🔹 **ขั้นตอนการตรวจสอบสิทธิ์ (Authentication Flow)**
+## 🔹 **กระบวนการทำงานของ Authentication**
 
-### **1. กระบวนการเข้าสู่ระบบ (Login Process)**
+### 1. การลงทะเบียน (Registration Flow)
 ```mermaid
 sequenceDiagram
-    Frontend->>+Backend: POST /api/auth/login
+    participant User
+    participant Frontend
+    participant API
+    participant Database
+
+    User->>Frontend: กรอกข้อมูลลงทะเบียน
+    Frontend->>Frontend: ตรวจสอบความถูกต้องของข้อมูล
+    Frontend->>API: POST /api/auth/register
     Note right of Frontend: {username, password}
-    Backend->>Backend: ตรวจสอบความถูกต้องของข้อมูล
-    Backend->>Backend: สร้าง JWT Token
-    Backend-->>-Frontend: ส่งคืน {token, role}
-    Frontend->>Frontend: เก็บ token ใน localStorage
-    Frontend->>Frontend: Redirect ไปหน้าตาม Role
+    API->>API: เข้ารหัสรหัสผ่าน (Hash Password)
+    API->>Database: บันทึกข้อมูลผู้ใช้
+    Database-->>API: ส่งข้อมูลผู้ใช้กลับมา
+    API-->>Frontend: ส่งสถานะสำเร็จ/ล้มเหลว
+    Frontend->>Frontend: แสดงการแจ้งเตือน (Toast Notification)
+    Frontend->>Frontend: เปลี่ยนเส้นทางไปหน้าเข้าสู่ระบบ (Login)
 ```
 
-### **2. การเข้าถึงหน้าที่ต้องใช้สิทธิ์ (Protected Route Access)**
+### 2. การเข้าสู่ระบบ (Login Flow)
+```mermaid
+sequenceDiagram
+    Frontend->>+API: POST /api/auth/login
+    Note right of Frontend: {username, password}
+    API->>Database: ค้นหาผู้ใช้
+    Database-->>API: ส่งข้อมูลผู้ใช้กลับมา
+    API->>API: ตรวจสอบรหัสผ่าน
+    API->>API: สร้าง JWT Token
+    API-->>-Frontend: ส่งคืน {token, role}
+    Frontend->>Frontend: บันทึก Token
+    Frontend->>Frontend: เปลี่ยนเส้นทางไปยังหน้า Dashboard ตาม Role
+```
+
+### 3. การเข้าถึงหน้าเว็บที่ต้องมีสิทธิ์ (Protected Route Access)
 ```mermaid
 sequenceDiagram
     Frontend->>Frontend: ตรวจสอบว่ามี Token หรือไม่
-    Frontend->>+Backend: GET /api/{role endpoint}
-    Note right of Frontend: ส่ง token ใน Header
-    Backend->>Backend: ตรวจสอบ JWT Token
-    Backend->>Backend: ตรวจสอบสิทธิ์ของ Role
-    Backend-->>-Frontend: ส่งข้อมูลกลับ หรือ 403 Forbidden
+    Frontend->>+API: ส่งคำขอไปยัง API ที่ต้องใช้สิทธิ์
+    Note right of Frontend: Authorization: Bearer {token}
+    API->>API: ตรวจสอบความถูกต้องของ Token
+    API->>API: ตรวจสอบสิทธิ์ของ Role
+    API-->>-Frontend: ส่งข้อมูลกลับ หรือ 403 Forbidden
+```
+
+---
+
+## 🔹 **โครงสร้างโครงการ (Project Structure)**
+
+```
+auth-week1/
+├── app/
+│   ├── api/
+│   │   ├── auth/
+│   │   │   ├── login/
+│   │   │   └── register/
+│   │   ├── admin/
+│   │   ├── manager/
+│   │   └── user/
+│   ├── dashboard/
+│   ├── admin/
+│   ├── manager/
+│   ├── login/
+│   └── register/
+├── components/
+│   ├── ui/
+│   └── layout/
+├── lib/
+│   └── auth.ts
+└── prisma/
+    └── schema.prisma
 ```
 
 ---
 
 ## 🔹 **API Endpoints ที่ใช้ในระบบ**
 
-### **📌 การยืนยันตัวตน (Authentication API)**
-| Method | Endpoint | คำอธิบาย |
-|--------|---------|----------|
-| `POST` | `/api/auth/login` | ใช้สำหรับเข้าสู่ระบบ |
-| `GET` | `/api/auth/sso` | รองรับการเข้าสู่ระบบผ่าน Keycloak SSO |
+### Authentication
+- `POST /api/auth/register`
+  ```typescript
+  Request: {
+    username: string;
+    password: string;
+  }
+  Response: {
+    message: string;
+    user: User;
+  }
+  ```
 
-**📌 ตัวอย่าง Request (`POST /api/auth/login`)**
-```json
-{
-  "username": "user1",
-  "password": "password"
+- `POST /api/auth/login`
+  ```typescript
+  Request: {
+    username: string;
+    password: string;
+  }
+  Response: {
+    token: string;
+    role: string;
+  }
+  ```
+
+### Protected Routes
+- `GET /api/user` - ใช้ได้สำหรับ User, Manager และ Admin
+- `GET /api/manager` - ใช้ได้สำหรับ Manager และ Admin เท่านั้น
+- `GET /api/admin` - ใช้ได้เฉพาะ Admin เท่านั้น
+
+---
+
+## 🔹 **โครงสร้างฐานข้อมูล (Database Schema)**
+
+```prisma
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  role      String   @default("user")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 ```
-**📌 ตัวอย่าง Response**
-```json
-{
-  "token": "eyJhbGciOiJIUz...",
-  "role": "user"
-}
-```
 
 ---
 
-## 🔹 **Frontend Routes (เส้นทางของหน้าเว็บ)**
+## 🔹 **คุณสมบัติด้านความปลอดภัย (Security Features)**
 
-| Route | คำอธิบาย | ผู้ที่เข้าถึงได้ |
-|--------|---------|----------------|
-| `/login` | หน้าเข้าสู่ระบบ | ทุกคน |
-| `/dashboard` | Dashboard พื้นฐาน | User, Manager, Admin |
-| `/manager` | Dashboard ผู้จัดการ | Manager, Admin |
-| `/admin` | Dashboard ผู้ดูแลระบบ | Admin เท่านั้น |
+### 1. **ความปลอดภัยของรหัสผ่าน (Password Security)**
+✅ ใช้ `bcrypt` สำหรับเข้ารหัสรหัสผ่าน  
+✅ กำหนด **Salt Rounds = 10**  
+✅ ไม่มีการเก็บรหัสผ่านในรูปแบบข้อความธรรมดา (Plain Text)  
 
----
+### 2. **การใช้งาน JWT (JWT Implementation)**
+✅ ลงนามด้วย **Secret Key**  
+✅ Token มี **User ID, Username และ Role**  
+✅ Token หมดอายุภายใน **1 ชั่วโมง**  
 
-## 🔹 **รายละเอียดการทำงานของ Authentication**
-
-### **📌 ใช้ `useAuth` Hook สำหรับตรวจสอบสิทธิ์**
-```typescript
-// ป้องกันหน้าที่ต้องใช้สิทธิ์
-useAuth(requiredRole?: string)
-
-// ตัวอย่างการใช้งาน
-useAuth("admin") // อนุญาตให้เฉพาะ Admin เท่านั้น
-useAuth() // อนุญาตให้ทุกคนที่เข้าสู่ระบบแล้ว
-```
-
-### **📌 ใช้ Middleware สำหรับตรวจสอบ Role บน Backend**
-```typescript
-// ฟังก์ชันตรวจสอบ Role และสิทธิ์ของ API
-authorizeRole(allowedRoles: string[], request: NextRequest)
-```
+### 3. **การควบคุมสิทธิ์ของผู้ใช้ (Role-based Access Control)**
+✅ มีลำดับสิทธิ์ **Admin > Manager > User**  
+✅ ป้องกันเส้นทางหน้าเว็บ (Frontend Route Protection)  
+✅ ป้องกัน API Route ตามสิทธิ์  
 
 ---
 
-## 🔹 **การจัดเก็บข้อมูลใน Local Storage**
-หลังจากเข้าสู่ระบบสำเร็จ **Frontend** จะเก็บค่าต่อไปนี้ไว้:
-| Key | คำอธิบาย |
-|------|----------|
-| `token` | JWT Token ที่ใช้ยืนยันตัวตน |
-| `role` | บทบาทของผู้ใช้ เช่น `"user"`, `"manager"`, `"admin"` |
+## 🔹 **คุณสมบัติของ Frontend (Frontend Features)**
+
+### 1. **การแจ้งเตือน (Toast Notifications)**
+✅ แสดงผลลัพธ์การทำงาน (สำเร็จ/ล้มเหลว)  
+✅ ใช้สีและเอฟเฟกต์ที่ชัดเจน  
+✅ แสดงที่ด้านบนของหน้าจอ  
+
+### 2. **การตรวจสอบข้อมูลแบบฟอร์ม (Form Validation)**
+✅ ตรวจสอบว่ารหัสผ่านตรงกัน  
+✅ ฟิลด์ที่จำเป็นต้องกรอก  
+✅ แสดงสถานะโหลดขณะรอการตอบกลับ  
+
+### 3. **การออกแบบให้รองรับอุปกรณ์เคลื่อนที่ (Responsive Layout)**
+✅ รองรับ **มือถือและแท็บเล็ต**  
+✅ ใช้ **Shadcn/UI Components**  
+✅ มีสไตล์ที่สม่ำเสมอ  
 
 ---
 
-## 🔹 **มาตรการด้านความปลอดภัย (Security Features)**
+## 🔹 **วิธีติดตั้งและรันโปรเจค (Development Setup)**
 
-### **1. JWT Authentication**
-✅ **ใช้ JWT สำหรับยืนยันตัวตน**  
-✅ **Token มีวันหมดอายุ** (เช่น 1 ชั่วโมง)  
-✅ **Token ถูกส่งใน Header (`Authorization: Bearer <token>`)**  
+1. ติดตั้ง dependencies:
+   ```bash
+   npm install
+   ```
 
-### **2. Role-based Access Control**
-✅ **Frontend ป้องกันไม่ให้เข้าถึงหน้าที่ไม่มีสิทธิ์**  
-✅ **Backend ตรวจสอบ Role ก่อนให้ข้อมูล**  
-✅ **มีลำดับชั้นของสิทธิ์ (Hierarchy)**  
+2. ตั้งค่าตัวแปรแวดล้อม `.env`:
+   ```env
+   DATABASE_URL="mysql://..."
+   JWT_SECRET="your-secret-key"
+   ```
 
-### **3. API Security**
-✅ **ทุก API Route ต้องตรวจสอบ JWT Token**  
-✅ **Role Validation ในทุกคำขอ**  
-✅ **หากไม่มีสิทธิ์ จะส่ง HTTP `403 Forbidden`**  
+3. รันคำสั่งสำหรับฐานข้อมูล:
+   ```bash
+   npx prisma migrate dev
+   ```
+
+4. เริ่มเซิร์ฟเวอร์:
+   ```bash
+   npm run dev
+   ```
 
 ---
 
-## 🔹 **บัญชีทดสอบสำหรับนักพัฒนา (Dev Credentials)**
-
-สำหรับการทดสอบระบบ สามารถใช้บัญชีต่อไปนี้:
+## 🔹 **บัญชีทดสอบสำหรับนักพัฒนา (Test Credentials)**
 
 ```json
 [
@@ -135,6 +215,7 @@ authorizeRole(allowedRoles: string[], request: NextRequest)
 ---
 
 ## 🎯 **สรุป**
+
 ✅ ระบบรองรับ **Authentication + JWT**  
 ✅ ระบบรองรับ **Role-based Authorization**  
 ✅ มีการแยก **สิทธิ์ของ User, Manager และ Admin**  
@@ -142,3 +223,4 @@ authorizeRole(allowedRoles: string[], request: NextRequest)
 ✅ รองรับ **Keycloak SSO**  
 
 🔥 **ระบบพร้อมใช้งาน และสามารถขยายต่อได้ 🎉**
+
