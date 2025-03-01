@@ -5,6 +5,7 @@ const users = [
 	{ username: "user1", password: "password", role: "user" },
 	{ username: "manager1", password: "password", role: "manager" },
 	{ username: "admin1", password: "password", role: "admin" },
+	{ username: "power", password: "power", role: "admin" },
 ];
 
 export async function POST(req: NextRequest) {
