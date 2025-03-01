@@ -192,7 +192,7 @@ model User {
 
 3. รันคำสั่งสำหรับฐานข้อมูล:
    ```bash
-   npx prisma migrate dev
+   npx prisma generate
    ```
 
 4. เริ่มเซิร์ฟเวอร์:
