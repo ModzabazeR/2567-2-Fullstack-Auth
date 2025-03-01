@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -20,7 +21,6 @@ export default function LoginPage() {
     const data = await res.json();
     if (data.token) {
       localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.role); // เก็บ Role ไว้เพื่อนำไป Redirect
 
       // Redirect ไปหน้าตาม Role
       if (data.role === "admin") router.push("/admin");
@@ -55,6 +55,12 @@ export default function LoginPage() {
             <Button className="w-full" onClick={handleLogin}>
               Sign In
             </Button>
+            <div className="text-center text-sm">
+              Need an account?{" "}
+              <Link href="/register" className="text-primary hover:underline">
+                Register here
+              </Link>
+            </div>
           </div>
         </div>
       </div>

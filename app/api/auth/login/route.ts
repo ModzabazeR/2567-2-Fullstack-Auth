@@ -1,18 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createToken } from "@/lib/auth";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { PrismaClient } from "@prisma/client";
 
-const users = [
-	{ username: "user1", password: "password", role: "user" },
-	{ username: "manager1", password: "password", role: "manager" },
-	{ username: "admin1", password: "password", role: "admin" },
-];
+const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
-	const { username, password } = await req.json();
-	const user = users.find((u) => u.username === username && u.password === password);
+	try {
+		const { username, password } = await req.json();
+		if (!username || !password) {
+			return NextResponse.json({ message: "Username and password required" }, { status: 400 });
+		}
 
-	if (!user) return NextResponse.json({ message: "Invalid credentials" }, { status: 401 });
+		// Find user from MySQL database
+		const user = await prisma.user.findUnique({ where: { username } });
+		if (!user) {
+			return NextResponse.json({ message: "Invalid credentials" }, { status: 401 });
+		}
 
-	const token = createToken({ username, role: user.role });
-	return NextResponse.json({ token, role: user.role });
+		// Verify password
+		const isValid = await bcrypt.compare(password, user.password);
+		if (!isValid) {
+			return NextResponse.json({ message: "Invalid credentials" }, { status: 401 });
+		}
+
+		// Generate JWT token
+		const token = jwt.sign({ id: user.id, username: user.username, role: user.role }, process.env.JWT_SECRET!, { expiresIn: "1h" });
+
+		return NextResponse.json({ token, role: user.role });
+	} catch (error) {
+		return NextResponse.json({ message: "Error logging in", error }, { status: 500 });
+	}
 }
