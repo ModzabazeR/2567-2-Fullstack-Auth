@@ -1,7 +1,7 @@
 "use client";
 import { useAuth } from "@/hooks/useAuth";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import {
   BarChart,
   Bar,
