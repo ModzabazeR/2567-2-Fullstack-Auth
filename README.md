@@ -204,13 +204,11 @@ model User {
 
 ## 🔹 **บัญชีทดสอบสำหรับนักพัฒนา (Test Credentials)**
 
-```json
-[
-  { "username": "user1", "password": "password", "role": "user" },
-  { "username": "manager1", "password": "password", "role": "manager" },
-  { "username": "admin1", "password": "password", "role": "admin" }
-]
-```
+| Username  | Password | Role    |
+|-----------|----------|---------|
+| user1     | password | user    |
+| manager1  | password | manager |
+| admin1    | password | admin   |
 
 ---
 
