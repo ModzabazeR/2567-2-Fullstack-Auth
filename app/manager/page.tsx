@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 
 export default function ManagerDashboard() {
-  useAuth("manager");
+  const { role } = useAuth("manager");
 
   return (
     <DashboardLayout title="Manager Dashboard" subtitle="User management panel">

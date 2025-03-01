@@ -44,7 +44,7 @@ sequenceDiagram
     Database-->>API: ส่งข้อมูลผู้ใช้กลับมา
     API->>API: ตรวจสอบรหัสผ่าน
     API->>API: สร้าง JWT Token
-    API-->>-Frontend: ส่งคืน {token, role}
+    API-->>-Frontend: ส่งคืน token
     Frontend->>Frontend: บันทึก Token
     Frontend->>Frontend: เปลี่ยนเส้นทางไปยังหน้า Dashboard ตาม Role
 ```

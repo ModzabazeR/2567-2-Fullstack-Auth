@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export async function POST(req: NextRequest) {
 	try {
@@ -20,7 +19,20 @@ export async function POST(req: NextRequest) {
 		});
 
 		return NextResponse.json({ message: "User registered successfully", user });
-	} catch (error) {
-		return NextResponse.json({ message: "Error registering user", error }, { status: 500 });
+	} catch (error: any) {
+		const errorMessage = "Error registering user";
+
+		if (error instanceof PrismaClientKnownRequestError) {
+			if (error.code === "P2002") {
+				return NextResponse.json({
+					message: errorMessage, error: {
+						code: error.code,
+						description: "Username already exists",
+					}
+				}, { status: 400 });
+			}
+		}
+
+		return NextResponse.json({ message: errorMessage, error }, { status: 500 });
 	}
 }
