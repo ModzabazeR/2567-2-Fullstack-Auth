@@ -10,7 +10,8 @@ const users = [
 export async function POST(req: NextRequest) {
 	const { username, password } = await req.json();
 	const user = users.find((u) => u.username === username && u.password === password);
-
+	console.log(username + " " + password);
+	
 	if (!user) return NextResponse.json({ message: "Invalid credentials" }, { status: 401 });
 
 	const token = createToken({ username, role: user.role });

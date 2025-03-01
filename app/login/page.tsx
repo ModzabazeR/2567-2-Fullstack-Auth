@@ -4,27 +4,37 @@ import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
+const loginSchema = yup.object().shape({
+  username: yup.string().required("Username is required"),
+  password: yup.string().required("Password is required"),
+})
 
 export default function LoginPage() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    resolver: yupResolver(loginSchema),
+  });
   const router = useRouter();
+  const fd = new FormData();
 
-  const handleLogin = async () => {
+  const handleLogin = async (data: { username: string; password: string }) => {
     const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ username: data.username, password: data.password }),
     });
 
-    const data = await res.json();
-    if (data.token) {
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("role", data.role); // เก็บ Role ไว้เพื่อนำไป Redirect
+    const result = await res.json();
+    if (result.token) {
+      localStorage.setItem("token", result.token);
+      localStorage.setItem("role", result.role); // เก็บ Role ไว้เพื่อนำไป Redirect
 
       // Redirect ไปหน้าตาม Role
-      if (data.role === "admin") router.push("/admin");
-      else if (data.role === "manager") router.push("/manager");
+      if (result.role === "admin") router.push("/admin");
+      else if (result.role === "manager") router.push("/manager");
       else router.push("/dashboard"); // Default User
     } else {
       alert("Login failed");
@@ -41,21 +51,29 @@ export default function LoginPage() {
               Enter your credentials to continue
             </p>
           </div>
-          <div className="space-y-4">
-            <Input
-              type="text"
-              placeholder="Username"
-              onChange={(e) => setUsername(e.target.value)}
-            />
-            <Input
-              type="password"
-              placeholder="Password"
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <Button className="w-full" onClick={handleLogin}>
+          <form onSubmit={handleSubmit(handleLogin)} className="space-y-4">
+            <div>
+              <Input
+                type="text"
+                name="username"
+                placeholder="Username"
+                {...register("username")}
+              />
+              {errors.username && <p className="text-red-500">{errors.username.message}</p>}
+            </div>
+            <div>
+              <Input
+                type="password"
+                name="password"
+                placeholder="Password"
+                {...register("password")}
+              />
+              {errors.password && <p className="text-red-500">{errors.password.message}</p>}
+            </div>
+            <Button className="w-full" type="submit">
               Sign In
             </Button>
-          </div>
+          </form>
         </div>
       </div>
     </div>
