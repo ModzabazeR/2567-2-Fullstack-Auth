@@ -3,11 +3,25 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
 
+// Validation functions
+const isValidUsername = (username: string) => /^[a-z0-9]+$/.test(username);
+const isValidPassword = (password: string) => /^[a-zA-Z0-9]+$/.test(password) && password.length >= 8;
+
 export async function POST(req: NextRequest) {
 	try {
 		const { username, password } = await req.json();
+		
 		if (!username || !password) {
 			return NextResponse.json({ message: "Username and password required" }, { status: 400 });
+		}
+
+		// Validate username and password format
+		if (!isValidUsername(username)) {
+			return NextResponse.json({ message: "Invalid username. Only lowercase letters and numbers are allowed." }, { status: 400 });
+		}
+
+		if (!isValidPassword(password)) {
+			return NextResponse.json({ message: "Invalid password. Only letters and numbers are allowed, and must be at least 8 characters long." }, { status: 400 });
 		}
 
 		// Find user from MySQL database

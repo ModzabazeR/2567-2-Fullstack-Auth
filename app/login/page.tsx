@@ -10,8 +10,15 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
 const loginSchema = yup.object().shape({
-  username: yup.string().required("Username is required"),
-  password: yup.string().required("Password is required"),
+  username: yup
+    .string()
+    .matches(/^[a-z0-9]+$/, "Username can only contain lowercase letters and numbers")
+    .required("Username is required"),
+  password: yup
+    .string()
+    .matches(/^[a-zA-Z0-9]+$/, "Password can only contain letters and numbers")
+    .min(8, "Password must be at least 8 characters long")
+    .required("Password is required"),
 });
 
 export default function LoginPage() {
@@ -22,8 +29,8 @@ export default function LoginPage() {
   } = useForm({
     resolver: yupResolver(loginSchema),
   });
+
   const router = useRouter();
-  const fd = new FormData();
 
   const handleLogin = async (data: { username: string; password: string }) => {
     const res = await fetch("/api/auth/login", {
