@@ -3,9 +3,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 
 export default function AdminDashboard() {
-  useAuth("admin");
+  const authRes = useAuth("admin");
+  
 
-  return (
+  return authRes.role !== null &&(
     <DashboardLayout
       title="Admin"
       subtitle="System management"

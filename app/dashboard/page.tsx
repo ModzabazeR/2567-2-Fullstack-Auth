@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 export default function UserDashboard() {
-  useAuth();
+  
 
   // Sample data for the chart
   const activityData = [
@@ -39,8 +39,10 @@ export default function UserDashboard() {
     { id: 2, title: "Meeting scheduled", time: "Yesterday" },
     { id: 3, title: "New comment received", time: "2 days ago" },
   ];
+  const authRes = useAuth();
+  
 
-  return (
+  return authRes.role !== null &&(
     <DashboardLayout title="Dashboard" subtitle="Overview">
       <div className="flex flex-col gap-6">
         {/* Welcome card with gradient background */}

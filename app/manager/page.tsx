@@ -6,7 +6,7 @@ import { UserIcon } from "lucide-react";
 export default function ManagerDashboard() {
   const { role } = useAuth("manager");
 
-  return (
+  return role !== null && (
     <DashboardLayout title="Manager" subtitle="Team oversight">
       <div className="grid gap-6 md:grid-cols-2">
         <div className="bg-white shadow-sm rounded-xl p-5 border border-gray-100 flex flex-col">
