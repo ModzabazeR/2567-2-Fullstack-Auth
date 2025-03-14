@@ -1,7 +1,5 @@
 "use client";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -12,7 +10,10 @@ import * as yup from "yup";
 const loginSchema = yup.object().shape({
   username: yup
     .string()
-    .matches(/^[a-z0-9]+$/, "Username can only contain lowercase letters and numbers")
+    .matches(
+      /^[a-z0-9]+$/,
+      "Username can only contain lowercase letters and numbers"
+    )
     .required("Username is required"),
   password: yup
     .string()

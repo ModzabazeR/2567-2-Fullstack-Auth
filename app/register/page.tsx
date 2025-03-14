@@ -1,42 +1,65 @@
 "use client";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+
+const registerSchema = yup.object().shape({
+  username: yup
+    .string()
+    .matches(
+      /^[a-z0-9]+$/,
+      "Username can only contain lowercase letters and numbers"
+    )
+    .required("Username is required"),
+  password: yup
+    .string()
+    .matches(/^[a-zA-Z0-9]+$/, "Password can only contain letters and numbers")
+    .min(8, "Password must be at least 8 characters long")
+    .required("Password is required"),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref("password")], "Passwords must match")
+    .required("Confirm password is required"),
+});
 
 export default function RegisterPage() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm({
+    resolver: yupResolver(registerSchema),
+  });
+
   const router = useRouter();
 
-  const handleRegister = async () => {
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
-
+  const handleRegister = async (data: {
+    username: string;
+    password: string;
+    confirmPassword: string;
+  }) => {
     try {
-      setIsLoading(true);
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({
+          username: data.username,
+          password: data.password,
+        }),
       });
 
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.message);
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message);
 
       toast.success("Registration successful!");
       router.push("/login");
     } catch (error: any) {
       toast.error(error.message || "Registration failed");
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -52,34 +75,42 @@ export default function RegisterPage() {
               Enter your details to register
             </p>
           </div>
-          <div className="space-y-4">
-            <Input
-              type="text"
-              placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              disabled={isLoading}
-            />
-            <Input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              disabled={isLoading}
-            />
-            <Input
-              type="password"
-              placeholder="Confirm Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              disabled={isLoading}
-            />
-            <Button
-              className="w-full"
-              onClick={handleRegister}
-              disabled={isLoading}
-            >
-              {isLoading ? "Creating account..." : "Register"}
+          <form onSubmit={handleSubmit(handleRegister)} className="space-y-4">
+            <div>
+              <Input
+                type="text"
+                placeholder="Username"
+                {...register("username")}
+                disabled={isSubmitting}
+              />
+              {errors.username && (
+                <p className="text-red-500">{errors.username.message}</p>
+              )}
+            </div>
+            <div>
+              <Input
+                type="password"
+                placeholder="Password"
+                {...register("password")}
+                disabled={isSubmitting}
+              />
+              {errors.password && (
+                <p className="text-red-500">{errors.password.message}</p>
+              )}
+            </div>
+            <div>
+              <Input
+                type="password"
+                placeholder="Confirm Password"
+                {...register("confirmPassword")}
+                disabled={isSubmitting}
+              />
+              {errors.confirmPassword && (
+                <p className="text-red-500">{errors.confirmPassword.message}</p>
+              )}
+            </div>
+            <Button className="w-full" type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Creating account..." : "Register"}
             </Button>
             <div className="text-center text-sm">
               Already have an account?{" "}
@@ -87,7 +118,7 @@ export default function RegisterPage() {
                 Sign in
               </Link>
             </div>
-          </div>
+          </form>
         </div>
       </div>
     </div>
