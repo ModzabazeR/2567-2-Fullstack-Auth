@@ -200,6 +200,13 @@ model User {
    npm run dev
    ```
 
+## 🔹 **วิธีติดตั้งและรันโปรเจค (Production Setup)**
+1. รัน Dockerfile:
+   ```sh
+   docker build -t auth-week1:1.0.0 -f .\Dockerfile .
+   docker run --name <container-name> -p <port-number>:3000 -e DATABASE_URL=<same-as-in-dot-env> -d auth-week1:1.0.0
+   ```
+
 ---
 
 ## 🔹 **บัญชีทดสอบสำหรับนักพัฒนา (Test Credentials)**
