@@ -52,6 +52,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ token, role: user.role });
   } catch (error) {
+    console.log(error);
     return NextResponse.json(
       { message: "Error logging in", error },
       { status: 500 }
