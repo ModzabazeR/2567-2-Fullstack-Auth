@@ -8,13 +8,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
 const loginSchema = yup.object().shape({
-  username: yup
-    .string()
-    .matches(
-      /^[a-z0-9]+$/,
-      "Username can only contain lowercase letters and numbers"
-    )
-    .required("Username is required"),
+  email: yup.string().email("Invalid email").required("Email is required"),
   password: yup
     .string()
     .matches(/^[a-zA-Z0-9]+$/, "Password can only contain letters and numbers")
@@ -33,12 +27,12 @@ export default function LoginPage() {
 
   const router = useRouter();
 
-  const handleLogin = async (data: { username: string; password: string }) => {
+  const handleLogin = async (data: { email: string; password: string }) => {
     const res = await fetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        username: data.username,
+        email: data.email,
         password: data.password,
       }),
     });
@@ -68,13 +62,9 @@ export default function LoginPage() {
           </div>
           <form onSubmit={handleSubmit(handleLogin)} className="space-y-4">
             <div>
-              <Input
-                type="text"
-                placeholder="Username"
-                {...register("username")}
-              />
-              {errors.username && (
-                <p className="text-red-500">{errors.username.message}</p>
+              <Input type="text" placeholder="Email" {...register("email")} />
+              {errors.email && (
+                <p className="text-red-500">{errors.email.message}</p>
               )}
             </div>
             <div>

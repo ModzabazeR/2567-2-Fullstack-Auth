@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { NextRequest } from "next/server";
 
 export interface UserPayload {
-  username: string;
+  email: string;
   role: string | "user" | "manager" | "admin";
 }
 
@@ -27,7 +27,7 @@ export function authorizeRole(roles: string[], req: NextRequest) {
 }
 
 // Validation functions
-export const isValidUsername = (username: string) =>
-  /^[a-z0-9]+$/.test(username);
+export const isValidEmail = (email: string) =>
+  /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
 export const isValidPassword = (password: string) =>
   /^[a-zA-Z0-9]+$/.test(password) && password.length >= 8;

@@ -9,13 +9,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
 const registerSchema = yup.object().shape({
-  username: yup
-    .string()
-    .matches(
-      /^[a-z0-9]+$/,
-      "Username can only contain lowercase letters and numbers"
-    )
-    .required("Username is required"),
+  email: yup.string().email("Invalid email").required("Email is required"),
   password: yup
     .string()
     .matches(/^[a-zA-Z0-9]+$/, "Password can only contain letters and numbers")
@@ -39,7 +33,7 @@ export default function RegisterPage() {
   const router = useRouter();
 
   const handleRegister = async (data: {
-    username: string;
+    email: string;
     password: string;
     confirmPassword: string;
   }) => {
@@ -48,7 +42,7 @@ export default function RegisterPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          username: data.username,
+          email: data.email,
           password: data.password,
         }),
       });
@@ -79,12 +73,12 @@ export default function RegisterPage() {
             <div>
               <Input
                 type="text"
-                placeholder="Username"
-                {...register("username")}
+                placeholder="Email"
+                {...register("email")}
                 disabled={isSubmitting}
               />
-              {errors.username && (
-                <p className="text-red-500">{errors.username.message}</p>
+              {errors.email && (
+                <p className="text-red-500">{errors.email.message}</p>
               )}
             </div>
             <div>
