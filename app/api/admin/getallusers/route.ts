@@ -11,6 +11,10 @@ export async function GET(req: NextRequest) {
     select: {
       id: true,
       email: true,
+      firstName: true,
+      lastName: true,
+      username: true,
+      bio: true,
       role: true,
     },
   });
