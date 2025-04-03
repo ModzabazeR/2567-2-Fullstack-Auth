@@ -1,6 +1,16 @@
 import { authorizeRole } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import * as yup from "yup";
+
+// Define validation schema
+const updateRoleSchema = yup.object({
+  userId: yup.number().required("User ID is required"),
+  newRole: yup
+    .string()
+    .oneOf(["user", "manager", "admin"], "Invalid role")
+    .required("New role is required"),
+});
 
 export async function PATCH(req: NextRequest) {
   const user = authorizeRole(["admin"], req);
@@ -9,19 +19,11 @@ export async function PATCH(req: NextRequest) {
 
   try {
     const body = await req.json();
+
+    // Validate request body
+    await updateRoleSchema.validate(body);
+
     const { userId, newRole } = body;
-
-    if (!userId || !newRole) {
-      return NextResponse.json(
-        { message: "Missing required fields" },
-        { status: 400 }
-      );
-    }
-
-    // Validate role
-    if (!["user", "manager", "admin"].includes(newRole)) {
-      return NextResponse.json({ message: "Invalid role" }, { status: 400 });
-    }
 
     const updatedUser = await prisma.user.update({
       where: { id: userId },
@@ -40,6 +42,11 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json(updatedUser);
   } catch (error) {
     console.error("Error updating user role:", error);
+
+    if (error instanceof yup.ValidationError) {
+      return NextResponse.json({ message: error.errors[0] }, { status: 400 });
+    }
+
     return NextResponse.json(
       { message: "Error updating user role" },
       { status: 500 }

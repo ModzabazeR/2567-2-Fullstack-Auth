@@ -3,38 +3,33 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { isValidEmail, isValidPassword } from "@/lib/auth";
 import * as argon2 from "argon2";
+import * as yup from "yup";
 
 const prisma = new PrismaClient();
 
+// Define validation schema
+const registerSchema = yup.object({
+  email: yup
+    .string()
+    .email("Invalid email format")
+    .required("Email is required"),
+  password: yup
+    .string()
+    .matches(
+      /^[a-zA-Z0-9]{8,}$/,
+      "Password must be at least 8 characters long and contain only letters and numbers"
+    )
+    .required("Password is required"),
+});
+
 export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await req.json();
-    if (!email || !password) {
-      return NextResponse.json(
-        { message: "Email and password required" },
-        { status: 400 }
-      );
-    }
+    const body = await req.json();
 
-    // Validate email and password format
-    if (!isValidEmail(email)) {
-      return NextResponse.json(
-        {
-          message: "Invalid email",
-        },
-        { status: 400 }
-      );
-    }
+    // Validate the request data
+    await registerSchema.validate(body);
 
-    if (!isValidPassword(password)) {
-      return NextResponse.json(
-        {
-          message:
-            "Invalid password. Only letters and numbers are allowed, and must be at least 8 characters long.",
-        },
-        { status: 400 }
-      );
-    }
+    const { email, password } = body;
 
     // Hash password
     const hashedPassword = await argon2.hash(password);
@@ -46,6 +41,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ message: "User registered successfully", user });
   } catch (error) {
+    if (error instanceof yup.ValidationError) {
+      return NextResponse.json({ message: error.errors[0] }, { status: 400 });
+    }
+
     if (error instanceof PrismaClientKnownRequestError) {
       if (error.code === "P2002") {
         return NextResponse.json(

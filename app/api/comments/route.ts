@@ -1,19 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authorizeRole } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import * as yup from "yup";
+
+// Define validation schemas
+const getCommentsSchema = yup.object({
+  userId: yup.string().required("User ID is required"),
+});
+
+const createCommentSchema = yup.object({
+  commentedOn: yup.number().required("User ID to comment on is required"),
+  content: yup
+    .string()
+    .required("Comment content is required")
+    .max(1000, "Comment must be less than 1000 characters"),
+});
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const userId = searchParams.get("userId");
-
-  if (!userId) {
-    return NextResponse.json({ error: "User ID is required" }, { status: 400 });
-  }
-
   try {
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get("userId");
+
+    // Validate query parameters
+    await getCommentsSchema.validate({ userId });
+
     const comments = await prisma.comment.findMany({
       where: {
-        commentedOn: parseInt(userId),
+        commentedOn: parseInt(userId!),
       },
       include: {
         commentedByUser: {
@@ -32,6 +45,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(comments);
   } catch (error) {
     console.error("Error fetching comments:", error);
+
+    if (error instanceof yup.ValidationError) {
+      return NextResponse.json({ message: error.errors[0] }, { status: 400 });
+    }
+
     return NextResponse.json(
       { error: "Failed to fetch comments" },
       { status: 500 }
@@ -46,18 +64,15 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { commentedOn, content } = body;
 
-    if (!commentedOn || !content) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
-    }
+    // Validate request body
+    await createCommentSchema.validate(body);
+
+    const { commentedOn, content } = body;
 
     const comment = await prisma.comment.create({
       data: {
-        commentedOn: parseInt(commentedOn),
+        commentedOn: parseInt(commentedOn.toString()),
         commentedBy: user.id,
         content,
       },
@@ -75,6 +90,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(comment);
   } catch (error) {
     console.error("Error creating comment:", error);
+
+    if (error instanceof yup.ValidationError) {
+      return NextResponse.json({ message: error.errors[0] }, { status: 400 });
+    }
+
     return NextResponse.json(
       { error: "Failed to create comment" },
       { status: 500 }
