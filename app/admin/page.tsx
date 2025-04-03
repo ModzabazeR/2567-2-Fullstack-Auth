@@ -19,6 +19,12 @@ export default function AdminDashboard() {
           />
           <LinkCard
             icon={UserIcon}
+            title="Edit Profile"
+            description="Edit your profile"
+            href="/profile/edit"
+          />
+          <LinkCard
+            icon={UserIcon}
             title="Manage Users"
             description="Manage role of users"
             href="/admin/manage-users"

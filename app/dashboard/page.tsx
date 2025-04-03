@@ -17,6 +17,12 @@ export default function Dashboard() {
             description="Read manual on how to use the system"
             href="/manual"
           />
+          <LinkCard
+            icon={UserIcon}
+            title="Edit Profile"
+            description="Edit your profile"
+            href="/profile/edit"
+          />
         </div>
       </UserLayout>
     )

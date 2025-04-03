@@ -17,6 +17,12 @@ export default function ManagerDashboard() {
             description="Read manual on how to manage the system"
             href="/manager/manual"
           />
+          <LinkCard
+            icon={UserIcon}
+            title="Edit Profile"
+            description="Edit your profile"
+            href="/profile/edit"
+          />
         </div>
       </ManagerLayout>
     )
