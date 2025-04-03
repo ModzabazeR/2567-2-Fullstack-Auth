@@ -9,27 +9,48 @@ datasource db {
 }
 
 model User {
-  id          Int       @id @default(autoincrement())
-  email       String    @unique @db.VarChar(255)
-  password    String    @db.VarChar(255)
-  username    String?   @unique @db.VarChar(255)
-  firstName   String?   @db.VarChar(255)
-  lastName    String?   @db.VarChar(255)
-  bio         String?   @db.VarChar(255)
-  role        String    @default("user") @db.VarChar(255)
-  CommentedOn Comment[] @relation("CommentedOn")
-  CommentedBy Comment[] @relation("CommentedBy")
+  id                           Int       @id @default(autoincrement())
+  email                        String    @unique @db.VarChar(255)
+  password                     String    @db.VarChar(255)
+  role                         String    @default("user") @db.VarChar(255)
+  bio                          String?   @db.VarChar(255)
+  firstName                    String?   @db.VarChar(255)
+  lastName                     String?   @db.VarChar(255)
+  username                     String?   @unique @db.VarChar(255)
+  createdAt                    DateTime  @default(now())
+  updatedAt                    DateTime
+  CommentedBy                  Comment[] @relation("CommentedBy")
+  CommentedOn                  Comment[] @relation("CommentedOn")
+  Post_Post_approvedByIdToUser Post[]    @relation("Post_approvedByIdToUser")
+  Post_Post_writerIdToUser     Post[]    @relation("Post_writerIdToUser")
 }
 
-// Comment on profiles
 model Comment {
-  id          Int      @id @default(autoincrement())
-  commentedOn Int
-  commentedBy Int
-  content     String   @db.VarChar(255)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              Int      @id @default(autoincrement())
+  commentedBy     Int
+  content         String   @db.VarChar(255)
+  commentedOn     Int
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  commentedByUser User     @relation("CommentedBy", fields: [commentedBy], references: [id])
+  commentedOnUser User     @relation("CommentedOn", fields: [commentedOn], references: [id])
 
-  commentedOnUser User @relation("CommentedOn", fields: [commentedOn], references: [id])
-  commentedByUser User @relation("CommentedBy", fields: [commentedBy], references: [id])
+  @@index([commentedBy], map: "Comment_commentedBy_fkey")
+  @@index([commentedOn], map: "Comment_commentedOn_fkey")
+}
+
+model Post {
+  id                           Int      @id @default(autoincrement())
+  title                        String   @db.VarChar(255)
+  content                      String   @db.Text
+  status                       String   @default("draft") @db.VarChar(50)
+  createdAt                    DateTime @default(now())
+  updatedAt                    DateTime
+  writerId                     Int
+  approvedById                 Int?
+  User_Post_approvedByIdToUser User?    @relation("Post_approvedByIdToUser", fields: [approvedById], references: [id])
+  User_Post_writerIdToUser     User     @relation("Post_writerIdToUser", fields: [writerId], references: [id])
+
+  @@index([approvedById], map: "Post_approvedById_fkey")
+  @@index([writerId], map: "Post_writerId_fkey")
 }

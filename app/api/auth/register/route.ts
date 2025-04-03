@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { isValidEmail, isValidPassword } from "@/lib/auth";
@@ -9,7 +8,7 @@ const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password, username, bio } = await req.json();
+    const { email, password } = await req.json();
     if (!email || !password) {
       return NextResponse.json(
         { message: "Email and password required" },

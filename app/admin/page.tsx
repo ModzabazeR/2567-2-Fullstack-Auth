@@ -41,6 +41,7 @@ export default function AdminDashboard() {
       const data = await response.json();
       setUsers(data);
     } catch (error) {
+      console.error("Error fetching users:", error);
       toast.error("Failed to load users");
     } finally {
       setLoading(false);
@@ -65,6 +66,7 @@ export default function AdminDashboard() {
       );
       toast.success("User role updated successfully");
     } catch (error) {
+      console.error("Error updating user role:", error);
       toast.error("Failed to update user role");
     }
   };
