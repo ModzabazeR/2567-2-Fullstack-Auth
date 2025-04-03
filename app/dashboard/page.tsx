@@ -4,7 +4,7 @@ import { UserIcon } from "lucide-react";
 import LinkCard from "@/components/link-card";
 import { UserLayout } from "@/components/layout/user-layout";
 
-export default function AdminDashboard() {
+export default function Dashboard() {
   const { role } = useAuth("user");
 
   return (
