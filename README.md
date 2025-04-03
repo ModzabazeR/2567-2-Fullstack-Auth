@@ -26,7 +26,7 @@ sequenceDiagram
     User->>Frontend: กรอกข้อมูลลงทะเบียน
     Frontend->>Frontend: ตรวจสอบความถูกต้องของข้อมูล
     Frontend->>API: POST /api/auth/register
-    Note right of Frontend: {username, password}
+    Note right of Frontend: {email, password}
     API->>API: เข้ารหัสรหัสผ่าน (Hash Password)
     API->>Database: บันทึกข้อมูลผู้ใช้
     Database-->>API: ส่งข้อมูลผู้ใช้กลับมา
@@ -39,7 +39,7 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     Frontend->>+API: POST /api/auth/login
-    Note right of Frontend: {username, password}
+    Note right of Frontend: {email, password}
     API->>Database: ค้นหาผู้ใช้
     Database-->>API: ส่งข้อมูลผู้ใช้กลับมา
     API->>API: ตรวจสอบรหัสผ่าน
@@ -96,7 +96,7 @@ auth-week1/
 - `POST /api/auth/register`
   ```typescript
   Request: {
-    username: string;
+    email: string;
     password: string;
   }
   Response: {
@@ -108,7 +108,7 @@ auth-week1/
 - `POST /api/auth/login`
   ```typescript
   Request: {
-    username: string;
+    email: string;
     password: string;
   }
   Response: {
@@ -129,7 +129,7 @@ auth-week1/
 ```prisma
 model User {
   id        Int      @id @default(autoincrement())
-  username  String   @unique
+  email     String   @unique
   password  String
   role      String   @default("user")
   createdAt DateTime @default(now())
@@ -148,7 +148,7 @@ model User {
 
 ### 2. **การใช้งาน JWT (JWT Implementation)**
 ✅ ลงนามด้วย **Secret Key**  
-✅ Token มี **User ID, Username และ Role**  
+✅ Token มี **User ID, Email และ Role**  
 ✅ Token หมดอายุภายใน **1 ชั่วโมง**  
 
 ### 3. **การควบคุมสิทธิ์ของผู้ใช้ (Role-based Access Control)**
@@ -211,11 +211,11 @@ model User {
 
 ## 🔹 **บัญชีทดสอบสำหรับนักพัฒนา (Test Credentials)**
 
-| Username  | Password | Role    |
+| Email     | Password | Role    |
 |-----------|----------|---------|
-| user1     | password | user    |
-| manager1  | password | manager |
-| admin1    | password | admin   |
+| user1@example.com     | X7eXaAsV3ujeHhz | user    |
+| manager1@example.com  | X7eXaAsV3ujeHhz | manager |
+| admin1@example.com    | X7eXaAsV3ujeHhz | admin   |
 
 ---
 

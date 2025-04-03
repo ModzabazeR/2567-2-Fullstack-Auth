@@ -2,26 +2,26 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { PrismaClient } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import { isValidPassword, isValidUsername } from "@/lib/auth";
+import { isValidEmail, isValidPassword } from "@/lib/auth";
+import * as argon2 from "argon2";
 
 const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
   try {
-    const { username, password } = await req.json();
-    if (!username || !password) {
+    const { email, password } = await req.json();
+    if (!email || !password) {
       return NextResponse.json(
-        { message: "Username and password required" },
+        { message: "Email and password required" },
         { status: 400 }
       );
     }
 
-    // Validate username and password format
-    if (!isValidUsername(username)) {
+    // Validate email and password format
+    if (!isValidEmail(email)) {
       return NextResponse.json(
         {
-          message:
-            "Invalid username. Only lowercase letters and numbers are allowed.",
+          message: "Invalid email",
         },
         { status: 400 }
       );
@@ -38,11 +38,11 @@ export async function POST(req: NextRequest) {
     }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await argon2.hash(password);
 
     // Store user in database
     const user = await prisma.user.create({
-      data: { username, password: hashedPassword },
+      data: { email, password: hashedPassword },
     });
 
     return NextResponse.json({ message: "User registered successfully", user });
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(
           {
             error: error.code,
-            message: "Username already exists",
+            message: "User already exists",
           },
           { status: 400 }
         );

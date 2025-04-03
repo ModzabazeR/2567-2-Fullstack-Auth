@@ -9,8 +9,30 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  username String @unique @db.VarChar(255)
-  password String @db.VarChar(255)
-  role     String @default("user") @db.VarChar(255)
+  id       Int       @id @default(autoincrement())
+  email    String    @unique @db.VarChar(255)
+  password String    @db.VarChar(255)
+  role     String    @default("user") @db.VarChar(255)
+  comments Comment[]
+  posts    Post[]
+}
+
+model Post {
+  id        Int       @id @default(autoincrement())
+  title     String    @db.VarChar(255)
+  content   String    @db.Text
+  createdDT DateTime  @default(now()) @db.DateTime(0)
+  postedBy  Int
+  user      User      @relation(fields: [postedBy], references: [id])
+  comments  Comment[]
+}
+
+model Comment {
+  id          Int      @id @default(autoincrement())
+  commentedBy Int
+  content     String   @db.Text
+  createdDT   DateTime @default(now()) @db.DateTime(0)
+  user        User     @relation(fields: [commentedBy], references: [id])
+  postId      Int
+  post        Post     @relation(fields: [postId], references: [id])
 }
