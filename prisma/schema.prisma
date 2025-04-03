@@ -9,30 +9,27 @@ datasource db {
 }
 
 model User {
-  id       Int       @id @default(autoincrement())
-  email    String    @unique @db.VarChar(255)
-  password String    @db.VarChar(255)
-  role     String    @default("user") @db.VarChar(255)
-  comments Comment[]
-  posts    Post[]
+  id          Int       @id @default(autoincrement())
+  email       String    @unique @db.VarChar(255)
+  password    String    @db.VarChar(255)
+  username    String?   @unique @db.VarChar(255)
+  firstName   String?   @db.VarChar(255)
+  lastName    String?   @db.VarChar(255)
+  bio         String?   @db.VarChar(255)
+  role        String    @default("user") @db.VarChar(255)
+  CommentedOn Comment[] @relation("CommentedOn")
+  CommentedBy Comment[] @relation("CommentedBy")
 }
 
-model Post {
-  id        Int       @id @default(autoincrement())
-  title     String    @db.VarChar(255)
-  content   String    @db.Text
-  createdDT DateTime  @default(now()) @db.DateTime(0)
-  postedBy  Int
-  user      User      @relation(fields: [postedBy], references: [id])
-  comments  Comment[]
-}
-
+// Comment on profiles
 model Comment {
   id          Int      @id @default(autoincrement())
+  commentedOn Int
   commentedBy Int
-  content     String   @db.Text
-  createdDT   DateTime @default(now()) @db.DateTime(0)
-  user        User     @relation(fields: [commentedBy], references: [id])
-  postId      Int
-  post        Post     @relation(fields: [postId], references: [id])
+  content     String   @db.VarChar(255)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  commentedOnUser User @relation("CommentedOn", fields: [commentedOn], references: [id])
+  commentedByUser User @relation("CommentedBy", fields: [commentedBy], references: [id])
 }
