@@ -34,6 +34,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (user.password === "") {
+      return NextResponse.json(
+        { message: "Wrong login method" },
+        { status: 401 }
+      );
+    }
+
     // Verify password
     const isValid = await argon2.verify(user.password, password);
     if (!isValid) {

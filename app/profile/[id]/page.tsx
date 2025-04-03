@@ -6,8 +6,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import Comment from "@/components/Comment";
-import { CommentType } from "@/components/Comment";
+import Comment from "@/components/comment";
+import { CommentType } from "@/components/comment";
 
 async function getComments(userId: string) {
   const res = await fetch(
