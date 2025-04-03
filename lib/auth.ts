@@ -26,9 +26,3 @@ export function authorizeRole(roles: string[], req: NextRequest) {
   const user = verifyToken(req);
   return user && roles.includes(user.role) ? user : null;
 }
-
-// Validation functions
-export const isValidEmail = (email: string) =>
-  /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
-export const isValidPassword = (password: string) =>
-  /^[a-zA-Z0-9]+$/.test(password) && password.length >= 8;

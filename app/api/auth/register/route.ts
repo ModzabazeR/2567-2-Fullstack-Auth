@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
-import { isValidEmail, isValidPassword } from "@/lib/auth";
 import * as argon2 from "argon2";
 import * as yup from "yup";
 

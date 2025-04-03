@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
-import { isValidPassword, isValidEmail } from "@/lib/auth";
 import * as argon2 from "argon2";
 import * as yup from "yup";
 

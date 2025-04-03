@@ -1,24 +1,24 @@
-import { NextResponse } from 'next/server';
-import { oAuth2Client } from '@/lib/googleAuth';
+import { NextResponse } from "next/server";
+import { oAuth2Client } from "@/lib/googleAuth";
 
 export async function GET() {
   try {
     const scopes = [
-      'https://www.googleapis.com/auth/userinfo.profile',
-      'https://www.googleapis.com/auth/userinfo.email',
+      "https://www.googleapis.com/auth/userinfo.profile",
+      "https://www.googleapis.com/auth/userinfo.email",
     ];
 
     const authorizeUrl = oAuth2Client.generateAuthUrl({
-      access_type: 'offline',
+      access_type: "offline",
       scope: scopes,
-      prompt: 'consent',
+      prompt: "consent",
     });
 
     return NextResponse.redirect(authorizeUrl);
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error(err);
     return NextResponse.json(
-      { error: 'Failed to initialize login' },
+      { error: "Failed to initialize login" },
       { status: 500 }
     );
   }
