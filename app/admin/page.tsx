@@ -22,7 +22,7 @@ interface User {
 }
 
 export default function AdminDashboard() {
-  const authRes = useAuth("admin");
+  const { role } = useAuth("admin");
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -72,7 +72,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    authRes.role !== null && (
+    role !== null && (
       <DashboardLayout title="Admin" subtitle="System management">
         <div className="space-y-6">
           <Card>
