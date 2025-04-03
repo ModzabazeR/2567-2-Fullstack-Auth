@@ -23,6 +23,12 @@ export default function Dashboard() {
             description="Edit your profile"
             href="/profile/edit"
           />
+          <LinkCard
+            icon={UserIcon}
+            title="Create Post"
+            description="Write a post"
+            href="/posts/create"
+          />
         </div>
       </UserLayout>
     )
