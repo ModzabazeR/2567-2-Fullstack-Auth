@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
 
     const comments = await prisma.comment.findMany({
       where: {
-        commentedOn: parseInt(userId!),
+        commentedOn: userId!,
       },
       include: {
         commentedByUser: {
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
 
     const comment = await prisma.comment.create({
       data: {
-        commentedOn: parseInt(commentedOn.toString()),
+        commentedOn: commentedOn,
         commentedBy: user.id,
         content,
       },

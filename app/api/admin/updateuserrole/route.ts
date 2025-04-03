@@ -5,7 +5,7 @@ import * as yup from "yup";
 
 // Define validation schema
 const updateRoleSchema = yup.object({
-  userId: yup.number().required("User ID is required"),
+  userId: yup.string().required("User ID is required"),
   newRole: yup
     .string()
     .oneOf(["user", "manager", "admin"], "Invalid role")

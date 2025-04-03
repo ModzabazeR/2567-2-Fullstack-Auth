@@ -9,27 +9,26 @@ datasource db {
 }
 
 model User {
-  id                           Int       @id @default(autoincrement())
-  email                        String    @unique @db.VarChar(255)
-  password                     String    @db.VarChar(255)
-  role                         String    @default("user") @db.VarChar(255)
-  bio                          String?   @db.VarChar(255)
-  firstName                    String?   @db.VarChar(255)
-  lastName                     String?   @db.VarChar(255)
-  username                     String?   @unique @db.VarChar(255)
-  createdAt                    DateTime  @default(now())
-  updatedAt                    DateTime
-  CommentedBy                  Comment[] @relation("CommentedBy")
-  CommentedOn                  Comment[] @relation("CommentedOn")
-  Post_Post_approvedByIdToUser Post[]    @relation("Post_approvedByIdToUser")
-  Post_Post_writerIdToUser     Post[]    @relation("Post_writerIdToUser")
+  id                       String    @id @default(uuid())
+  email                    String    @unique @db.VarChar(255)
+  password                 String    @db.VarChar(255)
+  role                     String    @default("user") @db.VarChar(255)
+  bio                      String?   @db.VarChar(255)
+  firstName                String?   @db.VarChar(255)
+  lastName                 String?   @db.VarChar(255)
+  username                 String?   @unique @db.VarChar(255)
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+  CommentedBy              Comment[] @relation("CommentedBy")
+  CommentedOn              Comment[] @relation("CommentedOn")
+  Post_Post_writerIdToUser Post[]    @relation("Post_writerIdToUser")
 }
 
 model Comment {
-  id              Int      @id @default(autoincrement())
-  commentedBy     Int
+  id              String   @id @default(uuid())
+  commentedBy     String
   content         String   @db.VarChar(255)
-  commentedOn     Int
+  commentedOn     String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   commentedByUser User     @relation("CommentedBy", fields: [commentedBy], references: [id])
@@ -40,17 +39,13 @@ model Comment {
 }
 
 model Post {
-  id                           Int      @id @default(autoincrement())
-  title                        String   @db.VarChar(255)
-  content                      String   @db.Text
-  status                       String   @default("draft") @db.VarChar(50)
-  createdAt                    DateTime @default(now())
-  updatedAt                    DateTime
-  writerId                     Int
-  approvedById                 Int?
-  User_Post_approvedByIdToUser User?    @relation("Post_approvedByIdToUser", fields: [approvedById], references: [id])
-  User_Post_writerIdToUser     User     @relation("Post_writerIdToUser", fields: [writerId], references: [id])
+  id                       String   @id @default(uuid())
+  title                    String   @db.VarChar(255)
+  content                  String   @db.Text
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+  writerId                 String
+  User_Post_writerIdToUser User     @relation("Post_writerIdToUser", fields: [writerId], references: [id])
 
-  @@index([approvedById], map: "Post_approvedById_fkey")
   @@index([writerId], map: "Post_writerId_fkey")
 }
