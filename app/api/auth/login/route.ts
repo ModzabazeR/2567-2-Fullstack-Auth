@@ -1,35 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
-import { isValidPassword, isValidEmail } from "@/lib/auth";
 import * as argon2 from "argon2";
+import * as yup from "yup";
+
+// Define validation schema
+const loginSchema = yup.object({
+  email: yup
+    .string()
+    .email("Invalid email format")
+    .required("Email is required"),
+  password: yup.string().required("Password is required"),
+});
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await req.json();
+    const body = await req.json();
 
-    if (!email || !password) {
-      return NextResponse.json(
-        { message: "Email and password required" },
-        { status: 400 }
-      );
-    }
+    // Validate the request data
+    await loginSchema.validate(body);
 
-    // Validate email and password format
-    if (!isValidEmail(email) || !isValidPassword(password)) {
-      return NextResponse.json(
-        {
-          message: "Invalid credentials",
-        },
-        { status: 401 }
-      );
-    }
+    const { email, password } = body;
 
     // Find user from MySQL database
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       return NextResponse.json(
         { message: "Invalid credentials" },
+        { status: 401 }
+      );
+    }
+
+    if (user.password === "") {
+      return NextResponse.json(
+        { message: "Wrong login method" },
         { status: 401 }
       );
     }
@@ -53,6 +57,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ token, role: user.role });
   } catch (error) {
     console.log(error);
+
+    if (error instanceof yup.ValidationError) {
+      return NextResponse.json({ message: error.errors[0] }, { status: 400 });
+    }
+
     return NextResponse.json(
       { message: "Error logging in", error },
       { status: 500 }

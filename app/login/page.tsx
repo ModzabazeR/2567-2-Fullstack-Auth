@@ -6,6 +6,8 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import GoogleLoginButton from "@/components/ui/googleLoginButton";
+import { toast } from "sonner";
 
 const loginSchema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
@@ -46,7 +48,7 @@ export default function LoginPage() {
       else if (result.role === "manager") router.push("/manager");
       else router.push("/dashboard"); // Default User
     } else {
-      alert("Login failed");
+      toast.error("Login Failed");
     }
   };
 
@@ -80,6 +82,20 @@ export default function LoginPage() {
             <Button className="w-full" type="submit">
               Sign In
             </Button>
+
+            {/* Divider */}
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200"></div>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white px-2 text-gray-500">Or</span>
+              </div>
+            </div>
+
+            {/* Google Login Button */}
+            <GoogleLoginButton />
+
             <div className="text-center text-sm">
               Need an account?{" "}
               <Link href="/register" className="text-primary hover:underline">

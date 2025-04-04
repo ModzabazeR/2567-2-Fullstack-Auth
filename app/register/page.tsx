@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import GoogleLoginButton from "@/components/ui/googleLoginButton";
 
 const registerSchema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
@@ -106,6 +107,20 @@ export default function RegisterPage() {
             <Button className="w-full" type="submit" disabled={isSubmitting}>
               {isSubmitting ? "Creating account..." : "Register"}
             </Button>
+            
+            {/* Divider */}
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200"></div>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-white px-2 text-gray-500">Or</span>
+              </div>
+            </div>
+            
+            {/* Google Login Button */}
+            <GoogleLoginButton />
+            
             <div className="text-center text-sm">
               Already have an account?{" "}
               <Link href="/login" className="text-primary hover:underline">

@@ -9,30 +9,43 @@ datasource db {
 }
 
 model User {
-  id       Int       @id @default(autoincrement())
-  email    String    @unique @db.VarChar(255)
-  password String    @db.VarChar(255)
-  role     String    @default("user") @db.VarChar(255)
-  comments Comment[]
-  posts    Post[]
-}
-
-model Post {
-  id        Int       @id @default(autoincrement())
-  title     String    @db.VarChar(255)
-  content   String    @db.Text
-  createdDT DateTime  @default(now()) @db.DateTime(0)
-  postedBy  Int
-  user      User      @relation(fields: [postedBy], references: [id])
-  comments  Comment[]
+  id                       String    @id @default(uuid())
+  email                    String    @unique @db.VarChar(255)
+  password                 String    @db.VarChar(255)
+  role                     String    @default("user") @db.VarChar(255)
+  bio                      String?   @db.VarChar(255)
+  firstName                String?   @db.VarChar(255)
+  lastName                 String?   @db.VarChar(255)
+  username                 String?   @unique @db.VarChar(255)
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+  CommentedBy              Comment[] @relation("CommentedBy")
+  CommentedOn              Comment[] @relation("CommentedOn")
+  Post_Post_writerIdToUser Post[]    @relation("Post_writerIdToUser")
 }
 
 model Comment {
-  id          Int      @id @default(autoincrement())
-  commentedBy Int
-  content     String   @db.Text
-  createdDT   DateTime @default(now()) @db.DateTime(0)
-  user        User     @relation(fields: [commentedBy], references: [id])
-  postId      Int
-  post        Post     @relation(fields: [postId], references: [id])
+  id              String   @id @default(uuid())
+  commentedBy     String
+  content         String   @db.VarChar(255)
+  commentedOn     String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  commentedByUser User     @relation("CommentedBy", fields: [commentedBy], references: [id])
+  commentedOnUser User     @relation("CommentedOn", fields: [commentedOn], references: [id])
+
+  @@index([commentedBy], map: "Comment_commentedBy_fkey")
+  @@index([commentedOn], map: "Comment_commentedOn_fkey")
+}
+
+model Post {
+  id                       String   @id @default(uuid())
+  title                    String   @db.VarChar(255)
+  content                  String   @db.Text
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+  writerId                 String
+  User_Post_writerIdToUser User     @relation("Post_writerIdToUser", fields: [writerId], references: [id])
+
+  @@index([writerId], map: "Post_writerId_fkey")
 }
