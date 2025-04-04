@@ -85,7 +85,7 @@ export default async function Page({
           <CardDescription>Comments on this profile</CardDescription>
         </CardHeader>
         <CardContent>
-          <Comment userId={parseInt(id)} comments={comments} />
+          <Comment userId={id} comments={comments} />
         </CardContent>
       </Card>
     </div>

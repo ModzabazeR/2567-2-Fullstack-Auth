@@ -24,7 +24,11 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: mysql://root:${MYSQL_ROOT_PASSWORD}@db:4407/auth
+      DATABASE_URL: mysql://root:${MYSQL_ROOT_PASSWORD}@db:3306/auth
+      JWT_SECRET: ${JWT_SECRET}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
     networks:
       - net1
 

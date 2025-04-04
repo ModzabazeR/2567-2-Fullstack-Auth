@@ -10,7 +10,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
 export interface CommentType {
-  id: number;
+  id: string;
   content: string;
   createdAt: string;
   commentedByUser: {
@@ -21,7 +21,7 @@ export interface CommentType {
 }
 
 interface CommentProps {
-  userId: number;
+  userId: string;
   comments: CommentType[];
 }
 

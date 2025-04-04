@@ -2,6 +2,8 @@ FROM node:lts-slim AS deps
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
+RUN npm i lightningcss-linux-x64-gnu --legacy-peer-deps --omit=dev
+RUN npm install --platform=linux --arch=x64 @tailwindcss/postcss
 
 FROM node:lts-slim AS builder
 WORKDIR /app

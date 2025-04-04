@@ -9,7 +9,7 @@ const getCommentsSchema = yup.object({
 });
 
 const createCommentSchema = yup.object({
-  commentedOn: yup.number().required("User ID to comment on is required"),
+  commentedOn: yup.string().required("User ID to comment on is required"),
   content: yup
     .string()
     .required("Comment content is required")
