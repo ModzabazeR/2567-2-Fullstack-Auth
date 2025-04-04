@@ -14,10 +14,8 @@ const registerSchema = yup.object({
     .required("Email is required"),
   password: yup
     .string()
-    .matches(
-      /^[a-zA-Z0-9]{8,}$/,
-      "Password must be at least 8 characters long and contain only letters and numbers"
-    )
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/, 
+      "Password must contain at least one uppercase letter, one lowercase letter, and one number")
     .required("Password is required"),
 });
 

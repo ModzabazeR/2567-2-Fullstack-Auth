@@ -13,7 +13,8 @@ const registerSchema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
   password: yup
     .string()
-    .matches(/^[a-zA-Z0-9]+$/, "Password can only contain letters and numbers")
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/, 
+      "Password must contain at least one uppercase letter, one lowercase letter, and one number")
     .min(8, "Password must be at least 8 characters long")
     .required("Password is required"),
   confirmPassword: yup
