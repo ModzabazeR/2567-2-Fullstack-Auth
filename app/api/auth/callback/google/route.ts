@@ -3,19 +3,12 @@ import { oAuth2Client } from "@/lib/googleAuth";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(req: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    // get code , error from URL query params
-    const url = new URL(req.url);
-    const code = url.searchParams.get("code");
-    const error = url.searchParams.get("error");
+    const { code } = await req.json();
 
-    // if has error parameter or no code (กรณียกเลิกหรือเกิดข้อผิดพลาด) redirect to login
-    if (error || !code) {
-      console.log(
-        "Google auth error or canceled:",
-        error || "No code provided"
-      );
+    if (!code) {
+      // Redirect กลับไปหน้า login เมื่อไม่มี code
       return NextResponse.redirect(
         `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/login`
       );
@@ -93,12 +86,10 @@ export async function GET(req: NextRequest) {
       { expiresIn: "1h" }
     );
 
-    // ส่ง redirect พร้อม token และ role ในรูปแบบของ URL parameters
-    return NextResponse.redirect(
-      `${
-        process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-      }/auth/callback?token=${token}&role=${user.role}`
-    );
+    return NextResponse.json({
+      token,
+      role: user.role,
+    });
   } catch (error) {
     console.error("Google login error:", error);
     // Redirect กลับไปหน้า login เมื่อเกิดข้อผิดพลาดใดๆ

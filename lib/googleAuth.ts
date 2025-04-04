@@ -1,8 +1,8 @@
-import { OAuth2Client } from 'google-auth-library';
+import { OAuth2Client } from "google-auth-library";
 
 // ใช้ base URL จาก environment variables และเพิ่มเส้นทาง callback
-const baseUrl = process.env.NEXT_PUBLIC_API_URL ;
-const redirectUri = `${baseUrl}/api/auth/callback/google`;
+const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+const redirectUri = `${baseUrl}/auth/callback/`;
 
 // สร้าง OAuth client
 export const oAuth2Client = new OAuth2Client(
